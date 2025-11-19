@@ -1,0 +1,25 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function hasPermission(permission) {
+      return request.auth != null
+        && request.auth.token.permissions != null
+        && permission in request.auth.token.permissions;
+    }
+
+    match /jobs/{jobId} {
+      allow read: if hasPermission("jobs.read");
+      allow create, update, delete: if hasPermission("jobs.write");
+    }
+
+    match /companies/{companyId} {
+      allow read: if hasPermission("companies.read");
+      allow create, update, delete: if hasPermission("companies.write");
+    }
+
+    match /portalUsers/{userId} {
+      allow read: if hasPermission("users.read");
+      allow write, update, delete: if hasPermission("users.write");
+    }
+  }
+}
